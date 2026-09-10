@@ -20,3 +20,12 @@ def load_db():
     ssl_verify_cert=True
 )
     return conn
+
+def listar_imoveis():
+    conn = load_db()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM imoveis")
+    resultado = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return resultado
