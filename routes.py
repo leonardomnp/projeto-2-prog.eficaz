@@ -1,6 +1,6 @@
 from flask import jsonify, request
 from servidor import (
-    listar_imoveis
+    listar_imoveis   
 )
  
 CAMPOS_OBRIGATORIOS = [

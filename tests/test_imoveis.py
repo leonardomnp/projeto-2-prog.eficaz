@@ -61,3 +61,22 @@ def test_listar_imoveis_erro(client, mock_listar_imoveis):
     data = response.get_json()
     assert data["error"] == "Erro ao listar imóveis"
     mock_listar_imoveis.assert_called_once()
+
+@patch("routes.buscar_imovel_por_id")
+def test_buscar_imovel_por_id_existente(mock_buscar, client):
+    mock_buscar.return_value = [IMOVEL_EXEMPLO, IMOVEL_EXEMPLO_2]
+    response = client.get("/imoveis/1")
+
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["id"] == 1
+    mock_buscar.assert_called_once_with(1)
+
+@patch("routes.buscar_imovel_por_id")
+def test_buscar_imovel_por_id_inexistente(mock_buscar, client):
+    mock_buscar.return_value = None
+
+    response = client.get("/imoveis/999")
+
+    assert response.status_code == 404
+    assert "erro" in response.get_json()

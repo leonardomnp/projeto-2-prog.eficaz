@@ -29,3 +29,12 @@ def listar_imoveis():
     cursor.close()
     conn.close()
     return resultado
+
+def buscar_imovel_por_id(imovel_id):
+    conn = load_db()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM imoveis WHERE id = %s", (imovel_id,))
+    resultado = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return resultado
