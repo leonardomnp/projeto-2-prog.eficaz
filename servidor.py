@@ -53,3 +53,18 @@ def criar_imovel(dados):
     cursor.close()
     conn.close()
     return novo_id
+
+def atualizar_imovel(imovel_id, dados):
+    conn = load_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        """UPDATE imoveis SET logradouro=%s, tipo_logradouro=%s, bairro=%s, cidade=%s,
+           cep=%s, tipo=%s, valor=%s, data_aquisicao=%s WHERE id=%s""",
+        (dados["logradouro"], dados["tipo_logradouro"], dados["bairro"], dados["cidade"],
+         dados["cep"], dados["tipo"], dados["valor"], dados["data_aquisicao"], imovel_id)
+    )
+    conn.commit()
+    linhas_afetadas = cursor.rowcount
+    cursor.close()
+    conn.close()
+    return linhas_afetadas

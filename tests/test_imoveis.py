@@ -116,3 +116,49 @@ def test_criar_imovel_sem_json(client):
     response = client.post("/imoveis")
  
     assert response.status_code == 400
+
+@patch("routes.atualizar_imovel")
+def test_atualizar_imovel_existente(mock_atualizar, client):
+    mock_atualizar.return_value = 1
+ 
+    dados = {
+        "logradouro": "Nicole Common",
+        "tipo_logradouro": "Travessa",
+        "bairro": "Lake Danielle",
+        "cidade": "Judymouth",
+        "cep": "85184",
+        "tipo": "casa em condominio",
+        "valor": 500000.00,
+        "data_aquisicao": "2017-07-29",
+    }
+ 
+    response = client.put("/imoveis/1", json=dados)
+ 
+    assert response.status_code == 200
+    mock_atualizar.assert_called_once_with(1, dados)
+ 
+ 
+@patch("routes.atualizar_imovel")
+def test_atualizar_imovel_inexistente(mock_atualizar, client):
+    mock_atualizar.return_value = 0
+ 
+    dados = {
+        "logradouro": "Nicole Common",
+        "tipo_logradouro": "Travessa",
+        "bairro": "Lake Danielle",
+        "cidade": "Judymouth",
+        "cep": "85184",
+        "tipo": "casa em condominio",
+        "valor": 500000.00,
+        "data_aquisicao": "2017-07-29",
+    }
+ 
+    response = client.put("/imoveis/999", json=dados)
+ 
+    assert response.status_code == 404
+ 
+ 
+def test_atualizar_imovel_dados_incompletos(client):
+    response = client.put("/imoveis/1", json={"cidade": "Judymouth"})
+ 
+    assert response.status_code == 400
