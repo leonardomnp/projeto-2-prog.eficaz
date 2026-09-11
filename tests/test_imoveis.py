@@ -179,3 +179,24 @@ def test_remover_imovel_inexistente(mock_remover, client):
     response = client.delete("/imoveis/999")
  
     assert response.status_code == 404
+
+@patch("routes.buscar_imoveis_por_tipo")
+def test_buscar_imoveis_por_tipo(mock_buscar, client):
+    mock_buscar.return_value = [IMOVEL_EXEMPLO_2]
+ 
+    response = client.get("/imoveis/tipo/apartamento")
+ 
+    assert response.status_code == 200
+    data = response.get_json()
+    assert len(data) == 1
+    assert all(item["tipo"] == "apartamento" for item in data)
+    mock_buscar.assert_called_once_with("apartamento")
+
+@patch("routes.buscar_imoveis_por_tipo")
+def test_buscar_imoveis_por_tipo_inexistente(mock_buscar, client):
+    mock_buscar.return_value = []
+ 
+    response = client.get("/imoveis/tipo/inexistente")
+ 
+    assert response.status_code == 200
+    assert response.get_json() == []

@@ -78,3 +78,12 @@ def remover_imovel(imovel_id):
     cursor.close()
     conn.close()
     return linhas_afetadas
+
+def buscar_imoveis_por_tipo(tipo):
+    conn = load_db()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM imoveis WHERE tipo = %s", (tipo,))
+    resultado = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return resultado
