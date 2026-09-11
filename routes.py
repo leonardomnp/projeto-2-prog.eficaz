@@ -36,3 +36,16 @@ def registrar_rotas(app):
 
         novo_id = criar_imovel(dados)
         return jsonify({"id": novo_id}), 201
+
+    @app.route("/imoveis/<int:imovel_id>", methods=["PUT"])
+    def rota_atualizar_imovel(imovel_id):
+        dados = request.get_json(silent=True) or {}
+        faltando = validar_dados(dados)
+        if faltando:
+            return jsonify({"erro": f"Campos obrigatórios faltando: {faltando}"}), 400
+
+        linhas_afetadas = atualizar_imovel(imovel_id, dados)
+        if linhas_afetadas == 0:
+            return jsonify({"erro": "Imóvel não encontrado"}), 404
+
+        return jsonify({"message": "Imóvel atualizado com sucesso"}), 200
