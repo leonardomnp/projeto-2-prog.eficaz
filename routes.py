@@ -1,6 +1,6 @@
 from flask import jsonify, request
 from servidor import (
-    listar_imoveis, buscar_imovel_por_id
+    listar_imoveis, buscar_imovel_por_id, criar_imovel
 )
  
 CAMPOS_OBRIGATORIOS = [
@@ -26,3 +26,13 @@ def registrar_rotas(app):
         if imovel is None:
             return jsonify({"erro": "Imóvel não encontrado"}), 404
         return jsonify(imovel), 200
+
+    @app.route("/imoveis", methods=["POST"])
+    def rota_criar_imovel():
+        dados = request.get_json(silent=True) or {}
+        faltando = validar_dados(dados)
+        if faltando:
+            return jsonify({"erro": f"Campos obrigatórios faltando: {faltando}"}), 400
+
+        novo_id = criar_imovel(dados)
+        return jsonify({"id": novo_id}), 201
