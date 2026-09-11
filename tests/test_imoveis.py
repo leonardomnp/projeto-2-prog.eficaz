@@ -157,8 +157,25 @@ def test_atualizar_imovel_inexistente(mock_atualizar, client):
  
     assert response.status_code == 404
  
- 
 def test_atualizar_imovel_dados_incompletos(client):
     response = client.put("/imoveis/1", json={"cidade": "Judymouth"})
  
     assert response.status_code == 400
+
+@patch("routes.remover_imovel")
+def test_remover_imovel_existente(mock_remover, client):
+    mock_remover.return_value = 1
+ 
+    response = client.delete("/imoveis/1")
+ 
+    assert response.status_code == 200
+    mock_remover.assert_called_once_with(1)
+ 
+ 
+@patch("routes.remover_imovel")
+def test_remover_imovel_inexistente(mock_remover, client):
+    mock_remover.return_value = 0
+ 
+    response = client.delete("/imoveis/999")
+ 
+    assert response.status_code == 404
