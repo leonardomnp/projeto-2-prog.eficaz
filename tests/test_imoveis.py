@@ -70,6 +70,7 @@ def test_buscar_imovel_por_id_existente(mock_buscar, client):
     assert response.status_code == 200
     data = response.get_json()
     assert data["id"] == 1
+    assert data["cidade"] == "Judymouth"
     mock_buscar.assert_called_once_with(1)
 
 @patch("routes.buscar_imovel_por_id")
@@ -80,3 +81,38 @@ def test_buscar_imovel_por_id_inexistente(mock_buscar, client):
 
     assert response.status_code == 404
     assert "erro" in response.get_json()
+ 
+@patch("routes.criar_imovel")
+def test_criar_imovel(mock_criar, client):
+    mock_criar.return_value = 5
+ 
+    novo_imovel = {
+        "logradouro": "Stacey Isle",
+        "tipo_logradouro": "Avenida",
+        "bairro": "Reneeberg",
+        "cidade": "Bentleymouth",
+        "cep": "01631",
+        "tipo": "terreno",
+        "valor": 352507.35,
+        "data_aquisicao": "2014-11-03",
+    }
+ 
+    response = client.post("/imoveis", json=novo_imovel)
+ 
+    assert response.status_code == 201
+    data = response.get_json()
+    assert data["id"] == 5
+    mock_criar.assert_called_once_with(novo_imovel)
+ 
+ 
+def test_criar_imovel_dados_incompletos(client):
+    response = client.post("/imoveis", json={"tipo": "casa"})
+ 
+    assert response.status_code == 400
+    assert "erro" in response.get_json()
+ 
+ 
+def test_criar_imovel_sem_json(client):
+    response = client.post("/imoveis")
+ 
+    assert response.status_code == 400

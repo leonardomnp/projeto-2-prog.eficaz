@@ -38,3 +38,18 @@ def buscar_imovel_por_id(imovel_id):
     cursor.close()
     conn.close()
     return resultado
+
+def criar_imovel(dados):
+    conn = load_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        """INSERT INTO imoveis (logradouro, tipo_logradouro, bairro, cidade, cep, tipo, valor, data_aquisicao)
+           VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+        (dados["logradouro"], dados["tipo_logradouro"], dados["bairro"], dados["cidade"],
+         dados["cep"], dados["tipo"], dados["valor"], dados["data_aquisicao"])
+    )
+    conn.commit()
+    novo_id = cursor.lastrowid
+    cursor.close()
+    conn.close()
+    return novo_id
