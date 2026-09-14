@@ -39,8 +39,11 @@ def test_listar_imoveis(mock_listar_imoveis, client):
     response = client.get("/imoveis")
     assert response.status_code == 200
     data = response.get_json()
-    assert len(data) == 2
-    assert data[0]["logradouro"] == "Nicole Common"
+    assert len(data["imoveis"]) == 2
+    assert data["imoveis"][0]["logradouro"] == "Nicole Common"
+    assert data["_links"]["self"] == {"href": "/imoveis", "method": "GET"}
+    assert data["_links"]["create"] == {"href": "/imoveis", "method": "POST"}
+    assert data["imoveis"][0]["_links"]["self"]["href"] == "/imoveis/1"
     mock_listar_imoveis.assert_called_once()
 
 
@@ -50,7 +53,8 @@ def test_listar_imoveis_vazio(mock_listar_imoveis, client):
     response = client.get("/imoveis")
     assert response.status_code == 200
     data = response.get_json()
-    assert len(data) == 0
+    assert data["imoveis"] == []
+    assert data["_links"]["self"]["href"] == "/imoveis"
     mock_listar_imoveis.assert_called_once()
 
 
@@ -60,7 +64,8 @@ def test_listar_imoveis_erro(mock_listar_imoveis, client):
     response = client.get("/imoveis")
     assert response.status_code == 500
     data = response.get_json()
-    assert data["error"] == "Erro ao listar imóveis"
+    assert data["erro"] == "Erro interno ao listar imóveis"
+    assert data["_links"]["self"]["href"] == "/imoveis"
     mock_listar_imoveis.assert_called_once()
 
 @patch("routes.buscar_imovel_por_id")
@@ -72,6 +77,9 @@ def test_buscar_imovel_por_id_existente(mock_buscar, client):
     data = response.get_json()
     assert data["id"] == 1
     assert data["cidade"] == "Judymouth"
+    assert data["_links"]["self"] == {"href": "/imoveis/1", "method": "GET"}
+    assert data["_links"]["update"] == {"href": "/imoveis/1", "method": "PUT"}
+    assert data["_links"]["delete"] == {"href": "/imoveis/1", "method": "DELETE"}
     mock_buscar.assert_called_once_with(1)
 
 
@@ -104,6 +112,9 @@ def test_criar_imovel(mock_criar, client):
     assert response.status_code == 201
     data = response.get_json()
     assert data["id"] == 5
+    assert response.headers["Location"] == "/imoveis/5"
+    assert data["_links"]["self"]["href"] == "/imoveis/5"
+    assert data["_links"]["collection"]["href"] == "/imoveis"
     mock_criar.assert_called_once_with(novo_imovel)
 
 
@@ -138,6 +149,7 @@ def test_atualizar_imovel_existente(mock_atualizar, client):
     response = client.put("/imoveis/1", json=dados)
 
     assert response.status_code == 200
+    assert response.get_json()["_links"]["self"]["href"] == "/imoveis/1"
     mock_atualizar.assert_called_once_with(1, dados)
 
 
@@ -173,6 +185,7 @@ def test_remover_imovel_existente(mock_remover, client):
     response = client.delete("/imoveis/1")
 
     assert response.status_code == 200
+    assert response.get_json()["_links"]["collection"] == {"href": "/imoveis", "method": "GET"}
     mock_remover.assert_called_once_with(1)
 
 
@@ -192,8 +205,9 @@ def test_buscar_imoveis_por_tipo(mock_buscar, client):
 
     assert response.status_code == 200
     data = response.get_json()
-    assert len(data) == 1
-    assert all(item["tipo"] == "apartamento" for item in data)
+    assert len(data["imoveis"]) == 1
+    assert all(item["tipo"] == "apartamento" for item in data["imoveis"])
+    assert data["_links"]["self"]["href"] == "/imoveis/tipo/apartamento"
     mock_buscar.assert_called_once_with("apartamento")
 
 
@@ -214,8 +228,9 @@ def test_buscar_imoveis_por_cidade(mock_buscar, client):
 
     assert response.status_code == 200
     data = response.get_json()
-    assert len(data) == 1
-    assert all(item["cidade"] == "Judymouth" for item in data)
+    assert len(data["imoveis"]) == 1
+    assert all(item["cidade"] == "Judymouth" for item in data["imoveis"])
+    assert data["_links"]["self"]["href"] == "/imoveis/cidade/Judymouth"
     mock_buscar.assert_called_once_with("Judymouth")
 
 
