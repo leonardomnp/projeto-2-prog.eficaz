@@ -87,3 +87,12 @@ def buscar_imoveis_por_tipo(tipo):
     cursor.close()
     conn.close()
     return resultado
+
+def buscar_imoveis_por_cidade(cidade):
+    conn = load_db()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM imoveis WHERE cidade = %s", (cidade,))
+    resultado = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return resultado

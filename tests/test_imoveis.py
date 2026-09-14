@@ -200,3 +200,25 @@ def test_buscar_imoveis_por_tipo_inexistente(mock_buscar, client):
  
     assert response.status_code == 200
     assert response.get_json() == []
+
+@patch("routes.buscar_imoveis_por_cidade")
+def test_buscar_imoveis_por_cidade(mock_buscar, client):
+    mock_buscar.return_value = [IMOVEL_EXEMPLO]
+ 
+    response = client.get("/imoveis/cidade/Judymouth")
+ 
+    assert response.status_code == 200
+    data = response.get_json()
+    assert len(data) == 1
+    assert all(item["cidade"] == "Judymouth" for item in data)
+    mock_buscar.assert_called_once_with("Judymouth")
+ 
+ 
+@patch("routes.buscar_imoveis_por_cidade")
+def test_buscar_imoveis_por_cidade_sem_resultado(mock_buscar, client):
+    mock_buscar.return_value = []
+ 
+    response = client.get("/imoveis/cidade/CidadeInexistente")
+ 
+    assert response.status_code == 200
+    assert response.get_json() == []

@@ -62,5 +62,5 @@ def registrar_rotas(app):
     def rota_buscar_imoveis_por_tipo(tipo):
         imoveis = buscar_imoveis_por_tipo(tipo)
         if not imoveis:
-            return jsonify({"erro": "Nenhum imóvel encontrado para o tipo especificado"}), 404
+            return jsonify({"erro": "Nenhum imovel encontrado para o tipo especificado"}), 404
         return jsonify(imoveis), 200
