@@ -1,6 +1,6 @@
 from flask import jsonify, request
 from servidor import (
-    listar_imoveis, buscar_imovel_por_id, criar_imovel, atualizar_imovel, remover_imovel, buscar_imoveis_por_tipo
+    listar_imoveis, buscar_imovel_por_id, criar_imovel, atualizar_imovel, remover_imovel, buscar_imoveis_por_tipo, buscar_imoveis_por_cidade
 )
  
 CAMPOS_OBRIGATORIOS = [
@@ -63,4 +63,9 @@ def registrar_rotas(app):
         imoveis = buscar_imoveis_por_tipo(tipo)
         if not imoveis:
             return jsonify({"erro": "Nenhum imovel encontrado para o tipo especificado"}), 404
+        return jsonify(imoveis), 200
+
+    @app.route("/imoveis/cidade/<cidade>", methods=["GET"])
+    def rota_buscar_por_cidade(cidade):
+        imoveis = buscar_imoveis_por_cidade(cidade)
         return jsonify(imoveis), 200
